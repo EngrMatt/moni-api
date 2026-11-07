@@ -1,0 +1,33 @@
+# app/__init__.py
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from .routers import (
+    user_router, 
+    auth_router,
+    category_router
+    )
+
+def create_app() -> FastAPI:
+    app = FastAPI(title="Moni API")
+
+    # 配置 CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # 將所有 router 放到列表中
+    routers = [
+        user_router.router,
+        auth_router.router,
+        category_router.router,
+        # 未來新增 router 直接加到這裡
+    ]
+
+    for r in routers:
+        app.include_router(r)
+
+    return app
