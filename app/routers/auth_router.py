@@ -6,6 +6,8 @@ from app.core.security import hash_password, verify_password
 from app.db import get_db
 from app.models.user import User
 from app.schemas.user_schema import RefreshTokenRequest, TokenResponse, UserCreate, UserResponse
+from app.routers.deps import get_current_user
+from app.services.account_service import ensure_cash_account
 from app.services.auth_service import invalidate_user_sessions, issue_tokens, revoke_refresh_token, rotate_refresh_token
 from app.services.category_service import init_user_categories
 
@@ -40,7 +42,13 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         db.refresh(new_user)
 
     init_user_categories(db, new_user.id)
+    ensure_cash_account(db, new_user.id)
     return new_user
+
+
+@router.get("/me", response_model=UserResponse)
+def me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 
 @router.post("/login", response_model=TokenResponse)

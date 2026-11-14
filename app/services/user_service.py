@@ -24,7 +24,9 @@ class UserService:
 
         # 4. 初始化預設類別
         from app.services.category_service import init_user_categories
+        from app.services.account_service import ensure_cash_account
         init_user_categories(db, new_user.id)
+        ensure_cash_account(db, new_user.id)
 
         return new_user
 
